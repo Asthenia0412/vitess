@@ -659,6 +659,12 @@ func (nz *normalizer) rewriteNotExpr(cursor *Cursor, node *NotExpr) {
 
 // rewriteVariable handles the rewriting of variable expressions to bind variables.
 func (nz *normalizer) rewriteVariable(cursor *Cursor, node *Variable) {
+	// Variables in SELECT ... INTO @var are assignment targets, not reads.
+	// Rewriting them to bind variables would change the type of the VarList
+	// elements, so they must be left alone.
+	if _, isSelectInto := cursor.Parent().(*SelectInto); isSelectInto {
+		return
+	}
 	// Only rewrite scope for variables on the left side of SET assignments.
 	if v, isSet := cursor.Parent().(*SetExpr); isSet && v.Var == node {
 		if node.Scope == NoScope {

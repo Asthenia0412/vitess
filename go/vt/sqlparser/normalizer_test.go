@@ -677,6 +677,12 @@ func TestRewrites(in *testing.T) {
 		expected: "insert into t(id) values(:__vtudvxyx)",
 		db:       false, udv: 1,
 	}, {
+		in:       "select 1 into @x",
+		expected: "select 1 into @x",
+	}, {
+		in:       "select id from t limit 1 into @x, @y",
+		expected: "select id from t limit 1 into @x, @y",
+	}, {
 		in:       "select row_count()",
 		expected: "select :__vtrcount as `row_count()`",
 		rowCount: true,
